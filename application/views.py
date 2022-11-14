@@ -44,20 +44,15 @@ def get_notes():
 @app.route("/usernotes")
 def get_user_notes():
     user_id = request.args.get("userid")
+    category_id = request.args.get("categoryid")
     notes = []
+    if category_id:
+        for note in NOTES:
+            if note["category_id"] == int(category_id) and note["user_id"] == int(user_id):
+                notes.append(note)
+        return jsonify({"notes": notes})
     for note in NOTES:
         if note["user_id"] == int(user_id):
-            notes.append(note)
-    return jsonify({"notes": notes})
-
-
-@app.route("/categorynotes")
-def get_category_notes():
-    category_id = request.args.get("categoryid")
-    user_id = request.args.get("userid")
-    notes = []
-    for note in NOTES:
-        if note["category_id"] == int(category_id) and note["user_id"] == int(user_id):
             notes.append(note)
     return jsonify({"notes": notes})
 
