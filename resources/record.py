@@ -1,8 +1,8 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
-from application.db import RECORDS, USERS, CATEGORIES
-from application.schemas import RecordSchema, RecordQuerySchema
+from db import RECORDS, USERS, CATEGORIES
+from schemas import RecordSchema, RecordQuerySchema
 
 blp = Blueprint("record", __name__, description="Operations on record")
 

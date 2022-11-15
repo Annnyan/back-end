@@ -1,8 +1,8 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
-from application.db import USERS
-from application.schemas import UserSchema
+from db import USERS
+from schemas import UserSchema
 
 blp = Blueprint("user", __name__, description="Operations on user")
 

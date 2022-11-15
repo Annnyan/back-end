@@ -1,8 +1,8 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
-from application.db import CATEGORIES
-from application.schemas import CategorySchema
+from db import CATEGORIES
+from schemas import CategorySchema
 
 blp = Blueprint("category", __name__, description="Operations on category")
 
