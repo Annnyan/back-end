@@ -1,30 +1,6 @@
 from flask import jsonify, request
 from application import app
-
-CATEGORIES = [
-    {
-        "id": 1,
-        "name": "food"
-    }
-]
-
-USERS = [
-    {
-        "id": 1,
-        "name": "Anna"
-    }
-]
-
-NOTES = [
-    {
-        "id": 1,
-        "user_id": 1,
-        "category_id": 1,
-        "date": "2022-10-22 11:40",
-        "expenses": 350
-    }
-]
-
+from application.db import USERS, CATEGORIES, RECORDS
 
 @app.route("/users")
 def get_users():
@@ -36,25 +12,25 @@ def get_categories():
     return jsonify({"categories": CATEGORIES})
 
 
-@app.route("/notes")
-def get_notes():
-    return jsonify({"notes": NOTES})
+@app.route("/records")
+def get_records():
+    return jsonify({"records": RECORDS})
 
 
-@app.route("/usernotes")
-def get_user_notes():
+@app.route("/userrecords")
+def get_user_records():
     user_id = request.args.get("userid")
     category_id = request.args.get("categoryid")
-    notes = []
+    records = []
     if category_id:
-        for note in NOTES:
-            if note["category_id"] == int(category_id) and note["user_id"] == int(user_id):
-                notes.append(note)
-        return jsonify({"notes": notes})
-    for note in NOTES:
-        if note["user_id"] == int(user_id):
-            notes.append(note)
-    return jsonify({"notes": notes})
+        for record in RECORDS:
+            if record["category_id"] == int(category_id) and record["user_id"] == int(user_id):
+                records.append(record)
+        return jsonify({"records": records})
+    for record in RECORDS:
+        if record["user_id"] == int(user_id):
+            records.append(record)
+    return jsonify({"records": records})
 
 
 @app.route("/adduser", methods=["POST"])
@@ -77,11 +53,11 @@ def add_category():
     return request_data
 
 
-@app.route("/addnote", methods=["POST"])
-def add_note():
+@app.route("/addrecord", methods=["POST"])
+def add_record():
     request_data = request.get_json()
-    for note in NOTES:
-        if note["id"] == request_data["id"]:
+    for record in RECORDS:
+        if record["id"] == request_data["id"]:
             return "Please, enter another id"
-    NOTES.append(request_data)
+    RECORDS.append(request_data)
     return request_data
