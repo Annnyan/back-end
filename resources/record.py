@@ -1,8 +1,10 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
-from db import RECORDS, USERS, CATEGORIES
+from db import db
+from models import RecordModel
 from schemas import RecordSchema, RecordQuerySchema
+from sqlalchemy.exc import IntegrityError
 
 blp = Blueprint("record", __name__, description="Operations on record")
 
@@ -14,31 +16,19 @@ class RecordList(MethodView):
     def get(self, **kwargs):
         user_id = kwargs.get("user_id")
         category_id = kwargs.get("category_id")
-        records = []
-        if not user_id:
-            abort(400, message="Need at least user_id")
         if category_id:
-            for record in RECORDS:
-                if (
-                        record["category_id"] == int(category_id)
-                        and record["user_id"] == int(user_id)
-                ):
-                    records.append(record)
-            return records
-        for record in RECORDS:
-            if record["user_id"] == int(user_id):
-                records.append(record)
-        return records
-
+            query = RecordModel.query.filter_by(user_id=user_id, category_id=category_id)
+            return query
+        query = RecordModel.query.filter_by(user_id=user_id)
+        return query
 
     @blp.arguments(RecordSchema)
     @blp.response(200, RecordSchema)
-    def post(self, request_data):
-        if request_data["id"] in [u["id"] for u in RECORDS]:
-            abort(400, message="ID must be unique")
-        if request_data["user_id"] not in [u["id"] for u in USERS]:
-            abort(400, message="User not found")
-        if request_data["category_id"] not in [u["id"] for u in CATEGORIES]:
-            abort(400, message="Category not found")
-        RECORDS.append(request_data)
-        return request_data
+    def post(self, record_data):
+        note = RecordModel(**record_data)
+        try:
+            db.session.add(note)
+            db.session.commit()
+        except IntegrityError:
+            abort(400, message="Error when creating note")
+        return note
