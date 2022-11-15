@@ -6,7 +6,9 @@ services:
    build:
      context: .
      dockerfile: Dockerfile
+   volumes: ["./application:/opt/application"]
    environment:
      PORT: "5005"
+     FLASK_DEBUG: "true"
    ports:
      - "5005:5005"
