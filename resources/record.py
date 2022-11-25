@@ -2,7 +2,7 @@ from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
 from db import db
-from models import RecordModel
+from models import RecordModel, CategoryModel
 from schemas import RecordSchema, RecordQuerySchema
 from sqlalchemy.exc import IntegrityError
 
@@ -26,9 +26,15 @@ class RecordList(MethodView):
     @blp.response(200, RecordSchema)
     def post(self, record_data):
         note = RecordModel(**record_data)
-        try:
-            db.session.add(note)
-            db.session.commit()
-        except IntegrityError:
-            abort(400, message="Error when creating note")
-        return note
+        category_id = record_data.get("category_id")
+        categories = CategoryModel.query.with_entities(CategoryModel.owner_id)
+        owner_id = categories.filter_by(id=category_id).scalar()
+        if owner_id == record_data["user_id"] or owner_id is None:
+            try:
+                db.session.add(note)
+                db.session.commit()
+            except IntegrityError:
+                abort(400, message="Error when creating note")
+            return note
+        else:
+            abort(403, message="Access is denied")
