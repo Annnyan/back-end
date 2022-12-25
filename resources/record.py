@@ -1,4 +1,5 @@
 from flask.views import MethodView
+from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint, abort
 
 from db import db
@@ -11,6 +12,7 @@ blp = Blueprint("record", __name__, description="Operations on record")
 
 @blp.route("/record")
 class RecordList(MethodView):
+    @jwt_required()
     @blp.arguments(RecordQuerySchema, location="query", as_kwargs=True)
     @blp.response(200, RecordSchema(many=True))
     def get(self, **kwargs):
@@ -22,6 +24,7 @@ class RecordList(MethodView):
         query = RecordModel.query.filter_by(user_id=user_id)
         return query
 
+    @jwt_required()
     @blp.arguments(RecordSchema)
     @blp.response(200, RecordSchema)
     def post(self, record_data):

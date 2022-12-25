@@ -1,4 +1,5 @@
 from flask.views import MethodView
+from flask_jwt_extended import jwt_required
 from flask_smorest import Blueprint, abort
 
 from db import db
@@ -11,10 +12,12 @@ blp = Blueprint("category", __name__, description="Operations on category")
 
 @blp.route("/category")
 class CategoryList(MethodView):
+    @jwt_required()
     @blp.response(200, CategorySchema(many=True))
     def get(self):
         return CategoryModel.query.all()
 
+    @jwt_required()
     @blp.arguments(CategorySchema)
     @blp.response(200, CategorySchema)
     def post(self, category_data):
